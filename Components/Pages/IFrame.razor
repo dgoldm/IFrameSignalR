@@ -1,0 +1,33 @@
+﻿@page "/iframe/{ConnectionId}"
+
+@layout Layout.EmptyLayout
+
+@using Microsoft.AspNetCore.SignalR
+@using Microsoft.AspNetCore.SignalR.Client
+@using IFrameSignalR.Hubs
+
+@inject IHubContext<AppHub> Hub
+@inject NavigationManager NavigationManager
+
+<button class="btn btn-primary" @onclick="ButtonClick">Click me</button>
+
+@code {
+	[Parameter] public string? ConnectionId { get; set; }
+
+	private HubConnection? hubConnection;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (ConnectionId == null) return;
+		if (hubConnection != null) return;
+
+		hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.BaseUri + nameof(AppHub)).Build();
+		await hubConnection.StartAsync();
+	}
+
+
+	async Task ButtonClick()
+	{
+		await Hub.Clients.Client(ConnectionId!).SendAsync("clicked");
+	}
+}
