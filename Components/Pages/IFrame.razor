@@ -9,7 +9,8 @@
 @inject IHubContext<AppHub> Hub
 @inject NavigationManager NavigationManager
 
-<button class="btn btn-primary" @onclick="ButtonClick">Click me</button>
+<button class="btn btn-primary" @onclick="Success">Success</button>
+<button class="btn btn-primary" @onclick="Failure">Failure</button>
 
 @code {
 	[Parameter] public string? ConnectionId { get; set; }
@@ -26,8 +27,14 @@
 	}
 
 
-	async Task ButtonClick()
+	async Task Success()
 	{
-		await Hub.Clients.Client(ConnectionId!).SendAsync("clicked");
+		var transactionId = Guid.NewGuid().ToString();
+		await Hub.Clients.Client(ConnectionId!).SendAsync("transactionComplete", "success", transactionId);
+	}
+
+	async Task Failure()
+	{
+		await Hub.Clients.Client(ConnectionId!).SendAsync("transactionComplete", "fail", null	);
 	}
 }
